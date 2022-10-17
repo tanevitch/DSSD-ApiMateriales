@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+from random import randint
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from app.db import db
@@ -15,7 +16,6 @@ solicitudes = Blueprint('solicitudes', __name__, url_prefix='/solicitudes')
 @jwt_required()
 def nueva_solicitud():
     get_jwt_identity()
-
     materiales_cantidades = request.json.get("materiales")
     fecha_lanzamiento = request.json.get("fecha_lanzamiento")
 
@@ -27,7 +27,7 @@ def nueva_solicitud():
         material= Material.buscarPorId(id_material)
         proovedor= Proovedor.buscarProovedorDeMaterial(material)
         if (proovedor.stock_material == 0):
-            return jsonify({"Error": f"No se puede satisfacer el pedido del material {material.nombre}"}), 400
+            return jsonify({"Error": f"No se puede satisfacer el pedido del material {material.nombre} por falta de stock"}), 400
 
         proovedor.stock_material-= materiales_cantidades[id_material]
         db.session.merge(proovedor)
@@ -38,8 +38,8 @@ def nueva_solicitud():
                 materiales_cantidades[id_material]
                 ))
 
-    nuevo_pedido= Pedido("2000", renglones)
-    if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_lanzamiento, "%Y-%m-%d %H:%M:%S")):
+    nuevo_pedido= Pedido(fecha_lanzamiento, "2000", renglones)
+    if (nuevo_pedido.fecha_entrega >= datetime.strptime(nuevo_pedido.fecha_lanzamiento, "%Y-%m-%d %H:%M:%S")):
         return jsonify({"Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega}"}), 400
 
     
@@ -47,3 +47,21 @@ def nueva_solicitud():
     db.session.commit()
     return jsonify(nuevo_pedido.toJSON()), 200
 
+@solicitudes.route("/consultar/<int:id>", methods=["GET"])
+@jwt_required()
+def consultar_solicitud(id):
+    get_jwt_identity()
+    solicitud= Pedido.buscarPorId(id)
+    if (not solicitud):
+        return jsonify({"Error": f"No hay un pedido con id {id}"}), 404
+    
+    # Simulación de reprogramación de fecha_entrega
+    if (randint(0,5)==3):
+        solicitud.fecha_entrega= solicitud.fechaEntregaRandom()
+        if (solicitud.fecha_entrega >= solicitud.fecha_lanzamiento):
+            solicitud.estado= "cancelada"
+            return jsonify({"Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {solicitud.fecha_entrega}"}), 400
+
+    db.session.add(solicitud)
+    db.session.commit()
+    return jsonify(solicitud.toJSON()), 200
