@@ -23,7 +23,7 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     """Development configuration."""
 
-    DB_HOST = environ.get("DB_HOST", "localhost")
+    DB_HOST = environ.get("DB_HOST", "mariadb")
     DB_USER = environ.get("DB_USER", "root")
     DB_PASS = environ.get("DB_PASS", "")
     DB_NAME = environ.get("DB_NAME", "api")
