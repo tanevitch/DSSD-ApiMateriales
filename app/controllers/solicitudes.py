@@ -42,7 +42,7 @@ def nueva_solicitud():
                 ))
 
     nuevo_pedido= Pedido("2000", renglones)
-    if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_lanzamiento, "%Y-%m-%d %H:%M:%S")):
+    if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_lanzamiento, "%Y-%m-%d")):
         return jsonify({
             "Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega}"}), 400
 
