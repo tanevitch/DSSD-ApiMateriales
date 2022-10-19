@@ -18,7 +18,6 @@ def nueva_solicitud():
     get_jwt_identity()
     materiales_cantidades = request.json.get("materiales")
     fecha_lanzamiento = request.json.get("fecha_lanzamiento")
-    print(fecha_lanzamiento)
     if (not materiales_cantidades or not fecha_lanzamiento):
         return jsonify({"Error": "Solicitud inválida"}), 400
     
@@ -28,9 +27,7 @@ def nueva_solicitud():
         proovedor= Proovedor.buscarProovedorDeMaterial(material)
         if (proovedor.stock_material == 0):
             return jsonify({
-                "Error": f"No se puede satisfacer el pedido del material {material.nombre} por falta de stock",
-                "stock_material": 0
-                }), 400
+                "Error": f"No se puede satisfacer el pedido del material {material.nombre} por falta de stock"}), 400
 
         proovedor.stock_material-= int(materiales_cantidades[id_material])
         db.session.merge(proovedor)
@@ -42,9 +39,9 @@ def nueva_solicitud():
                 ))
 
     nuevo_pedido= Pedido(fecha_lanzamiento, renglones)
-    # if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_lanzamiento, "%Y-%m-%d")):
-    #     return jsonify({
-    #         "Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega}"}), 400
+    if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_lanzamiento, "%Y-%m-%d")):
+        return jsonify({
+            "Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega}"}), 400
 
     
     db.session.add(nuevo_pedido)
