@@ -1,0 +1,171 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+        "version": "1.0.6",
+        "title": "Swagger API Materiales",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "email": "apiteam@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "host": "127.0.0.1:5001",
+    "basePath": "",
+    "tags": [
+        
+        {
+            "name": "solicitudes",
+            "description": "Solicitudes de materiales"
+        },
+        {
+            "name": "materiales",
+            "description": "About materiales"
+           
+        }
+    ],
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "paths": {
+        "/materiales": {
+            "get": {
+                "tags": [
+                    "materiales"
+                ],
+                "summary": "Listado de materiales",
+                "description": "Obtiene listado de materiales disponibles junto a su ID",
+                "operationId": "uploadFile",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+           
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Materiales"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "petstore_auth": [
+                            "write:pets",
+                            "read:pets"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/solicitudes/nueva": {
+            "post": {
+                "tags": [
+                    "solicitudes"
+                ],
+                "summary": "Agregar solicitud",
+                "description": "",
+                
+                "consumes": [
+                    "application/json",
+                    "application/xml"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/xml"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Parámetros para realizar la solicitud de materiales",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Solicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "405": {
+                        "description": "Invalid input"
+                    },
+                    "400": {
+                        "description": "Solicitud inválida"
+                    },
+                    "200": {
+                        "description": "Solicitud aceptada"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        }
+  
+    },
+
+ 
+    
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "example": "bearer {token}"
+          
+            
+        }
+     
+    },
+    "definitions": {
+        "Materiales": {
+            "type": "object",
+            "properties": {
+                "id_material": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "nombre": {
+                    "type": "string"
+                }
+               
+            }
+        },
+       
+        "Solicitud": {
+            "type": "object",
+
+          
+            "properties": {
+                "fecha_lanzamiento": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+            
+                "materiales": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example":{
+                        "3": "500",
+                        "5": "800"
+                    }
+                }
+            }
+          
+        }
+    },
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    }
+}
