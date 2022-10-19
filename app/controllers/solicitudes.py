@@ -4,7 +4,6 @@ from random import randint
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from app.db import db
-
 from app.models.material import Material
 from app.models.pedido import Pedido
 from app.models.proovedor import Proovedor
@@ -41,7 +40,7 @@ def nueva_solicitud():
     nuevo_pedido= Pedido(fecha_lanzamiento, renglones)
     if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_lanzamiento, "%Y-%m-%d")):
         return jsonify({
-            "Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega}"}), 400
+            "Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega.date()}"}), 400
 
     
     db.session.add(nuevo_pedido)
