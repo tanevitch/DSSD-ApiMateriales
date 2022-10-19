@@ -14,16 +14,14 @@ class Pedido(db.Model):
     fecha_generacion_pedido = db.Column(db.DateTime, nullable = False)
     fecha_lanzamiento = db.Column(db.DateTime, nullable = False)
     fecha_entrega = db.Column(db.DateTime, nullable = False)
-    solicitante_id= db.Column(db.Integer, nullable= False)
     renglones = relationship(Renglon, backref=db.backref('pedidos'))
     estado= db.Column(db.String(50), nullable= False)
 
-    def __init__(self,fecha_lanzamiento, solicitante_id, renglones):
+    def __init__(self,fecha_lanzamiento, renglones):
         self.fecha_lanzamiento = fecha_lanzamiento
         self.fecha_generacion_pedido= datetime.now()
         self.fecha_entrega= self.fechaEntregaRandom()
         self.renglones = renglones
-        self.solicitante_id = solicitante_id
         self.estado= "pendiente"
 
     def fechaEntregaRandom(self):
@@ -37,9 +35,7 @@ class Pedido(db.Model):
         return {
             "id_pedido": self.id_pedido,
             "fecha_generacion_pedido": self.fecha_generacion_pedido,
-            "fecha_lanzamiento": self.fecha_lanzamiento,
-            "fecha_entrega": self.fecha_entrega,
-            "id_caso": self.solicitante_id,
+            "fecha_entrega": self.fecha_entrega.strftime('%Y-%m-%d'),
             "estado": self.estado,
             "pedidos": [renglon.toJSON() for renglon in self.renglones]
         }

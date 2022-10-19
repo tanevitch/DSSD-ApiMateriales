@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  mariadb:
+    image: mariadb:10.9.3
+    container_name: mariadb
+    volumes:
+      - ../mariadb:/var/lib/mysql/data/api
+    ports:
+      - $MARIADB_LOCAL_PORT:$MARIADB_DOCKER_PORT
+    environment:
+      - MARIADB_ROOT_PASSWORD=
+      - MARIADB_DATABASE=$MARIADB_DATABASE
+      - MARIADB_ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
+      - MARIADB_RANDOM_ROOT_PASSWORD
+
+  api:
+    image: python:3.10.7
+    container_name: api
+    command: sh -c "cd python-api && python3 -m pip install --upgrade pip && pip install -r requirements.txt && flask run --host=0.0.0.0 --port=5001"
+    volumes:
+      - type: bind
+        source: ../../DSSD-ApiMateriales
+        target: /python-api
+    depends_on:
+      - mariadb
+    ports:
+      - "$APP_LOCAL_PORT:$APP_DOCKER_PORT"
