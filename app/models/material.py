@@ -15,6 +15,10 @@ class Material(db.Model):
     def buscarPorId(cls, id):
         return cls.query.get(id)
 
+    @classmethod 
+    def all(cls):
+        return cls.query.all()
+
     def toJSON(self):
         return {
             "id_material": self.id_material,

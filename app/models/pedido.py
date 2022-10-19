@@ -28,7 +28,7 @@ class Pedido(db.Model):
         return {
             "id_pedido": self.id_pedido,
             "fecha_generacion_pedido": self.fecha_generacion_pedido,
-            "fecha_entrega": self.fecha_entrega,
+            "fecha_entrega": self.fecha_entrega.strftime('%Y-%m-%d'),
             "id_caso": self.solicitante_id,
             "estado": self.estado,
             "pedidos": [renglon.toJSON() for renglon in self.renglones]

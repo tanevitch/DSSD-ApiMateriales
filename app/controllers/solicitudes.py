@@ -29,7 +29,7 @@ def nueva_solicitud():
         if (proovedor.stock_material == 0):
             return jsonify({"Error": f"No se puede satisfacer el pedido del material {material.nombre}"}), 400
 
-        proovedor.stock_material-= materiales_cantidades[id_material]
+        proovedor.stock_material-= int(materiales_cantidades[id_material])
         db.session.merge(proovedor)
         renglones.append(
             Renglon(
@@ -40,10 +40,13 @@ def nueva_solicitud():
 
     nuevo_pedido= Pedido("2000", renglones)
     if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_lanzamiento, "%Y-%m-%d %H:%M:%S")):
-        return jsonify({"Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega}"}), 400
+        return jsonify({
+            "Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega}",
+            "fecha_entrega": nuevo_pedido.fecha_entrega.strftime('%Y-%m-%d')
+            }), 400
 
     
     db.session.add(nuevo_pedido)
     db.session.commit()
-    return jsonify(nuevo_pedido.toJSON()), 200
+    return jsonify(nuevo_pedido.toJSON())
 
