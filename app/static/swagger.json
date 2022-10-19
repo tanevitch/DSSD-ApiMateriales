@@ -1,9 +1,8 @@
 {
-    "openapi": "3.0.0",
+    "openapi": "3.0.1",
     "info": {
-        "description": "You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
-        "version": "1.0.6",
         "title": "Swagger API Materiales",
+        "description": "You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "email": "apiteam@swagger.io"
@@ -11,10 +10,18 @@
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        }
+        },
+        "version": "1.0.6"
     },
-    "host": "127.0.0.1:5001",
-    "basePath": "",
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    },
+    "server": 
+        {
+            "url": "http://127.0.0.1:5001/"
+        }
+    ,
     "tags": [
         {
             "name": "solicitudes",
@@ -25,10 +32,6 @@
             "description": "About materiales"
         }
     ],
-    "schemes": [
-        "http",
-        "https"
-    ],
     "paths": {
         "/materiales": {
             "get": {
@@ -38,17 +41,15 @@
                 "summary": "Listado de materiales",
                 "description": "Obtiene listado de materiales disponibles junto a su ID",
                 "operationId": "uploadFile",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "responses": {
                     "200": {
                         "description": "successful operation",
-                        "schema": {
-                            "$ref": "#/definitions/Materiales"
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Materiales"
+                                }
+                            }
                         }
                     }
                 }
@@ -60,46 +61,75 @@
                     "solicitudes"
                 ],
                 "summary": "Agregar solicitud",
-                "description": "",
-                "consumes": [
-                    "application/json",
-                    "application/xml"
-                ],
-                "produces": [
-                    "application/json",
-                    "application/xml"
-                ],
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "Parámetros para realizar la solicitud de materiales",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Solicitud"
+                "requestBody": {
+                    "description": "Parámetros para realizar la solicitud de materiales",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Solicitud"
+                            }
+                        },
+                        "application/xml": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Solicitud"
+                            }
                         }
-                    }
-                ],
+                    },
+                    "required": true
+                },
                 "responses": {
-                    "405": {
-                        "description": "Invalid input"
+                    "200": {
+                        "description": "Solicitud aceptada",
+                        "content": {}
                     },
                     "400": {
-                        "description": "Solicitud inválida"
+                        "description": "Solicitud inválida",
+                        "content": {}
                     },
-                    "200": {
-                        "description": "Solicitud aceptada"
+                    "405": {
+                        "description": "Invalid input",
+                        "content": {}
                     }
                 },
                 "security": [
                     {
                         "Bearer": []
                     }
-                ]
+                ],
+                "x-codegen-request-body-name": "body"
             }
         }
     },
     "components": {
+        "schemas": {
+            "Materiales": {
+                "type": "object",
+                "properties": {
+                    "id_material": {
+                        "type": "integer",
+                        "format": "int32",
+                        "required": true
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+            "Solicitud": {
+                "type": "object",
+                "properties": {
+                    "fecha_lanzamiento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "materiales": {
+                        "type": "object",
+                        "example": "{\"4\":\"20\",\"3\":\"13\"}"
+                    }
+                }
+            }
+        },
         "securitySchemes": {
             "Bearer": {
                 "type": "http",
@@ -107,41 +137,5 @@
                 "bearerFormat": "JWT"
             }
         }
-    },
-    "definitions": {
-        "Materiales": {
-            "type": "object",
-            "properties": {
-                "id_material": {
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "nombre": {
-                    "type": "string"
-                }
-            }
-        },
-        "Solicitud": {
-            "type": "object",
-            "properties": {
-                "fecha_lanzamiento": {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "materiales": {
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "3": "500",
-                        "5": "800"
-                    }
-                }
-            }
-        }
-    },
-    "externalDocs": {
-        "description": "Find out more about Swagger",
-        "url": "http://swagger.io"
     }
 }
