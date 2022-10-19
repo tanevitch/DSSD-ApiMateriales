@@ -1,5 +1,5 @@
 {
-    "swagger": "2.0",
+    "openapi": "3.0.0",
     "info": {
         "description": "You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
         "version": "1.0.6",
@@ -16,7 +16,6 @@
     "host": "127.0.0.1:5001",
     "basePath": "",
     "tags": [
-        
         {
             "name": "solicitudes",
             "description": "Solicitudes de materiales"
@@ -24,7 +23,6 @@
         {
             "name": "materiales",
             "description": "About materiales"
-           
         }
     ],
     "schemes": [
@@ -46,7 +44,6 @@
                 "produces": [
                     "application/json"
                 ],
-           
                 "responses": {
                     "200": {
                         "description": "successful operation",
@@ -54,15 +51,7 @@
                             "$ref": "#/definitions/Materiales"
                         }
                     }
-                },
-                "security": [
-                    {
-                        "petstore_auth": [
-                            "write:pets",
-                            "read:pets"
-                        ]
-                    }
-                ]
+                }
             }
         },
         "/solicitudes/nueva": {
@@ -72,7 +61,6 @@
                 ],
                 "summary": "Agregar solicitud",
                 "description": "",
-                
                 "consumes": [
                     "application/json",
                     "application/xml"
@@ -110,21 +98,15 @@
                 ]
             }
         }
-  
     },
-
- 
-    
-    "securityDefinitions": {
-        "Bearer": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header",
-            "example": "bearer {token}"
-          
-            
+    "components": {
+        "securitySchemes": {
+            "Bearer": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
         }
-     
     },
     "definitions": {
         "Materiales": {
@@ -137,31 +119,25 @@
                 "nombre": {
                     "type": "string"
                 }
-               
             }
         },
-       
         "Solicitud": {
             "type": "object",
-
-          
             "properties": {
                 "fecha_lanzamiento": {
                     "type": "string",
                     "format": "date-time"
                 },
-            
                 "materiales": {
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "example":{
+                    "example": {
                         "3": "500",
                         "5": "800"
                     }
                 }
             }
-          
         }
     },
     "externalDocs": {
