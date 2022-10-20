@@ -5,6 +5,7 @@ from app.controllers.proovedores import proovedores
 from app.controllers.solicitudes import solicitudes
 from app.controllers.materiales import materiales
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_cors import CORS
 
 from flask_jwt_extended import JWTManager
 from app import db
@@ -12,6 +13,7 @@ from config import config
 
 def create_app(environment="development"):
     app = Flask(__name__)
+    CORS(app)
     app.register_blueprint(auth)
     app.register_blueprint(proovedores)
     app.register_blueprint(solicitudes)

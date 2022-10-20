@@ -82,7 +82,7 @@
                         "content": {}
                     },
                     "405": {
-                        "description": "Invalid input",
+                        "description": "Método no permitido",
                         "content": {}
                     }
                 },
