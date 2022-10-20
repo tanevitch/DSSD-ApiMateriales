@@ -63,11 +63,6 @@
                             "schema": {
                                 "$ref": "#/components/schemas/Solicitud"
                             }
-                        },
-                        "application/xml": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Solicitud"
-                            }
                         }
                     },
                     "required": true
@@ -102,12 +97,10 @@
                 "properties": {
                     "id_material": {
                         "type": "integer",
-                        "format": "int32",
-                        "required": true
+                        "format": "int32"
                     },
                     "nombre": {
-                        "type": "string",
-                        "required": true
+                        "type": "string"
                     }
                 }
             },
