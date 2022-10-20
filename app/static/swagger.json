@@ -38,7 +38,7 @@
                 "description": "Obtiene listado de materiales disponibles junto a su ID",
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "successful operation.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -69,15 +69,15 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Solicitud aceptada",
+                        "description": "Solicitud aceptada.",
                         "content": {}
                     },
                     "400": {
-                        "description": "Solicitud inválida",
+                        "description": "Solicitud inválida.",
                         "content": {}
                     },
                     "405": {
-                        "description": "Método no permitido",
+                        "description": "Método no permitido.",
                         "content": {}
                     }
                 },
