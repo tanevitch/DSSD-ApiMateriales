@@ -114,7 +114,7 @@
             "Solicitud": {
                 "type": "object",
                 "properties": {
-                    "fecha_lanzamiento": {
+                    "fecha_necesaria_entrega": {
                         "type": "string",
                         "format": "date"
                     },

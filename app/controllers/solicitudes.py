@@ -16,8 +16,8 @@ solicitudes = Blueprint('solicitudes', __name__, url_prefix='/solicitudes')
 def nueva_solicitud():
     get_jwt_identity()
     materiales_cantidades = request.json.get("materiales")
-    fecha_lanzamiento = request.json.get("fecha_lanzamiento")
-    if (not materiales_cantidades or not fecha_lanzamiento):
+    fecha_necesaria_entrega = request.json.get("fecha_necesaria_entrega")
+    if (not materiales_cantidades or not fecha_necesaria_entrega):
         return jsonify({"Error": "Solicitud inválida"}), 400
     
     renglones= []
@@ -36,9 +36,8 @@ def nueva_solicitud():
                 material,
                 int(materiales_cantidades[id_material])
                 ))
-
-    nuevo_pedido= Pedido(fecha_lanzamiento, renglones)
-    if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_lanzamiento, "%Y-%m-%d")):
+    nuevo_pedido= Pedido(fecha_necesaria_entrega, renglones)
+    if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_necesaria_entrega, "%Y-%m-%d")):
         return jsonify({
             "Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {nuevo_pedido.fecha_entrega.date()}"}), 400
 
@@ -58,7 +57,7 @@ def consultar_solicitud(id):
     # Simulación de reprogramación de fecha_entrega
     if (randint(0,5)==3):
         solicitud.fecha_entrega= solicitud.fechaEntregaRandom()
-        if (solicitud.fecha_entrega >= solicitud.fecha_lanzamiento):
+        if (solicitud.fecha_entrega >= solicitud.fecha_necesaria_entrega):
             solicitud.estado= "cancelada"
             return jsonify({"Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {solicitud.fecha_entrega}"}), 400
 
