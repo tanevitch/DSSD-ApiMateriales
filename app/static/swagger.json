@@ -16,11 +16,7 @@
     "externalDocs": {
         "description": "Find out more about Swagger",
         "url": "http://swagger.io"
-    },
-    "server": 
-        {
-            "url": "http://127.0.0.1:5001/"
-        }
+    }
     ,
     "tags": [
         {
@@ -40,7 +36,6 @@
                 ],
                 "summary": "Listado de materiales",
                 "description": "Obtiene listado de materiales disponibles junto a su ID",
-                "operationId": "uploadFile",
                 "responses": {
                     "200": {
                         "description": "successful operation",
