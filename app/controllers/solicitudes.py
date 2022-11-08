@@ -67,11 +67,12 @@ def nueva_solicitud():
     nuevo_pedido= Pedido(renglones)
     
     if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_necesaria_entrega, "%Y-%m-%d")):
-        return [{
+        return [
+                {
                     "error": "No se puede satisfacer el pedido en los plazos requeridos, la fecha de entrega estimada es posterior a la solicitada",
                 },
                 {
-                    "detalle": nuevo_pedido.fecha_entrega.date()
+                    "fecha_entrega": nuevo_pedido.fecha_entrega.date()
                 }], 400
 
     db.session.add(nuevo_pedido)
