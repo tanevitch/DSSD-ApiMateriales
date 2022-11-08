@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-import sqlite3
 
 db= SQLAlchemy()
 
@@ -10,9 +9,9 @@ def init_db(app):
         from app.models import material
         from app.models import pedido
         from app.models import proovedor
-        db.drop_all()
+        # db.drop_all()
         db.create_all()
-        seed()
+        # seed()
 
 def seed():
     from app.models.material import Material
@@ -33,10 +32,14 @@ def seed():
     p3= Proovedor("María Ramírez", "fabricante", m3, 20000)
     p4= Proovedor("Juana Lopez", "reciclador", m4, 20000)
     p5= Proovedor("Pedro Rodriguez", "fabricante", m5, 20000)
+    p6= Proovedor("Mirta Juarez", "fabricante", m6, 20000)
+    p7= Proovedor("Macarena Poll", "fabricante", m7, 20000)
+    p8= Proovedor("Lucas Marquez", "reciclador", m8, 20000)
+    p9= Proovedor("Marcos Rodriguez", "fabricante", m9, 20000)
+    p10= Proovedor("Patricia Gutierrez", "fabricante", m10, 20000)
 
         
-    for proovedor in [p1,p2,p3,p4,p5]:
+    for proovedor in [p1,p2,p3,p4,p5,p6,p7,p8,p9,p10]:
         db.session.add(proovedor)
-
     
     db.session.commit()

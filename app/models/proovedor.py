@@ -19,11 +19,3 @@ class Proovedor(db.Model):
     @classmethod
     def buscarProovedorDeMaterial(cls, material):
         return cls.query.filter(cls.material == material).first()
-
-    def toJSON(self):
-        return {
-            "id_proovedor": self.id_proovedor,
-            "tipo": self.tipo,
-            "material": self.material.toJSON(),
-            "stock_material": self.stock_material
-        }

@@ -20,9 +20,3 @@ class Renglon(db.Model):
         self.proovedor= proovedor
         self.material= material
         self.cantidad= cantidad
-
-    def toJSON(self):
-        return {
-            "proovedor": self.proovedor.toJSON(),
-        }
-

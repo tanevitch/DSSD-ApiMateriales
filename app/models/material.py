@@ -18,9 +18,3 @@ class Material(db.Model):
     @classmethod 
     def all(cls):
         return cls.query.all()
-
-    def toJSON(self):
-        return {
-            "id_material": self.id_material,
-            "nombre" : self.nombre
-        }

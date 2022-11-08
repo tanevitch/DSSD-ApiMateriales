@@ -1,7 +1,6 @@
 from os import environ
 from flask import Flask
 from app.controllers.auth import auth
-from app.controllers.proovedores import proovedores 
 from app.controllers.solicitudes import solicitudes
 from app.controllers.materiales import materiales
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -10,12 +9,15 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from app import db
 from config import config
+from flask_marshmallow import Marshmallow
+
 
 def create_app(environment="development"):
     app = Flask(__name__)
     CORS(app)
+    Marshmallow(app)
+
     app.register_blueprint(auth)
-    app.register_blueprint(proovedores)
     app.register_blueprint(solicitudes)
     app.register_blueprint(materiales)
 
