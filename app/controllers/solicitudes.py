@@ -39,15 +39,12 @@ def nueva_solicitud():
                 )
             )
     if (productos_sin_stock):
-        return [
-                {
-                    "error": "No se puede satisfacer el pedido, algunos proovedores no cuentan con el stock suficiente"
-                },
+        return jsonify(
                 {
                     "detalle": renglones_schema.dump(productos_sin_stock)
                 }
                 
-        ], 400
+        ), 400
 
     
     #  INTENTAR EFECTUAR PEDIDO
@@ -67,17 +64,14 @@ def nueva_solicitud():
     nuevo_pedido= Pedido(renglones)
     
     if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_necesaria_entrega, "%Y-%m-%d")):
-        return [
-                {
-                    "error": "No se puede satisfacer el pedido en los plazos requeridos, la fecha de entrega estimada es posterior a la solicitada",
-                },
+        return jsonify(
                 {
                     "fecha_entrega": nuevo_pedido.fecha_entrega.date()
-                }], 400
+                }), 400
 
     db.session.add(nuevo_pedido)
     db.session.commit()
-    return pedido_schema.dump(nuevo_pedido), 200
+    return jsonify(pedido_schema.dump(nuevo_pedido)), 200
 
 @solicitudes.route("/consultar/<int:id>", methods=["GET"])
 @jwt_required()
