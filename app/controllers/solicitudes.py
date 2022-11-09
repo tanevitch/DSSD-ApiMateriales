@@ -22,6 +22,9 @@ def nueva_solicitud():
     get_jwt_identity()
     materiales_cantidades = request.json.get("materiales")
     fecha_necesaria_entrega = request.json.get("fecha_necesaria_entrega")
+    print("----------------------------------")
+    print(materiales_cantidades, fecha_necesaria_entrega)
+    print("----------------------------------")
     if (not materiales_cantidades or not fecha_necesaria_entrega):
         return jsonify({"Error": "Solicitud inválida"}), 400
     
@@ -30,7 +33,7 @@ def nueva_solicitud():
     for id_material in materiales_cantidades:
         material= Material.buscarPorId(id_material)
         proovedor= Proovedor.buscarProovedorDeMaterial(material)
-        if (proovedor.stock_material < materiales_cantidades[id_material]):
+        if (proovedor.stock_material < int(materiales_cantidades[id_material])):
             productos_sin_stock.append(
                 Renglon(
                     proovedor,
@@ -38,12 +41,16 @@ def nueva_solicitud():
                     int(materiales_cantidades[id_material])
                 )
             )
+    print("----------------------------------")
+    print(productos_sin_stock)
+    print("----------------------------------")
     if (productos_sin_stock):
         return jsonify(
-                {
-                    "detalle": renglones_schema.dump(productos_sin_stock)
-                }
-                
+            {
+                "id": None,
+                "detalle": renglones_schema.dump(productos_sin_stock),
+                "fecha_entrega": None
+            }
         ), 400
 
     
@@ -62,16 +69,26 @@ def nueva_solicitud():
         db.session.merge(proovedor) 
     
     nuevo_pedido= Pedido(renglones)
-    
+    print("----------------------------------")
+    print(nuevo_pedido)
+    print("----------------------------------")
     if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_necesaria_entrega, "%Y-%m-%d")):
         return jsonify(
-                {
-                    "fecha_entrega": nuevo_pedido.fecha_entrega.date()
-                }), 400
+            {
+                "id": None,
+                "detalle": f"La fecha de entrega puede ser para el { fecha_necesaria_entrega.split()[0]}",
+                "fecha_entrega": fecha_necesaria_entrega.split()[0]
+                
+            }), 400
 
     db.session.add(nuevo_pedido)
     db.session.commit()
-    return jsonify(pedido_schema.dump(nuevo_pedido)), 200
+    return jsonify({
+                "id": pedido_schema.dump(nuevo_pedido)["id"],
+                "detalle": pedido_schema.dump(nuevo_pedido),
+                "fecha_entrega": pedido_schema.dump(nuevo_pedido)["fecha_entrega"].split()[0]
+             #   "fecha_entrega": datetime.strftime(datetime.strptime(pedido_schema.dump(nuevo_pedido)["fecha_entrega"], '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d')
+            }), 200
 
 @solicitudes.route("/consultar/<int:id>", methods=["GET"])
 @jwt_required()
