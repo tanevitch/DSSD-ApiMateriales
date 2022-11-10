@@ -3,6 +3,7 @@ from flask import Flask
 from app.controllers.auth import auth
 from app.controllers.solicitudes import solicitudes
 from app.controllers.materiales import materiales
+from app.controllers.sedes import sedes
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask_cors import CORS
 
@@ -20,6 +21,7 @@ def create_app(environment="development"):
     app.register_blueprint(auth)
     app.register_blueprint(solicitudes)
     app.register_blueprint(materiales)
+    app.register_blueprint(sedes)
 
     env = environ.get("FLASK_ENV", environment)
     app.config.from_object(config[env])

@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+import datetime
 
 db= SQLAlchemy()
 
@@ -9,9 +10,10 @@ def init_db(app):
         from app.models import material
         from app.models import pedido
         from app.models import proovedor
-        # db.drop_all()
+        from app.models import sede
+        db.drop_all()
         db.create_all()
-        # seed()
+        seed()
 
 def seed():
     from app.models.material import Material
@@ -38,8 +40,20 @@ def seed():
     p9= Proovedor("Marcos Rodriguez", "fabricante", m9, 20000)
     p10= Proovedor("Patricia Gutierrez", "fabricante", m10, 20000)
 
+    s_fecha_inicio = datetime.datetime.now()
+    s_fecha_fin = x = datetime.datetime(2024, 5, 17)
+
+    from app.models.sede import Sede
+    s1= Sede("Marco y Atendió", "Fabricante de Marcos",s_fecha_inicio,s_fecha_fin)
+    s2= Sede("Estuche o esmiche", "Fabricante de estuches",s_fecha_inicio, s_fecha_fin)
+    s3= Sede("Patilla o Pati Después", "Fabricante de patillas",s_fecha_inicio, s_fecha_fin)
+    s4= Sede("Lente Jazo", "Fabricante de lentes",s_fecha_inicio, s_fecha_fin)
+
         
     for proovedor in [p1,p2,p3,p4,p5,p6,p7,p8,p9,p10]:
         db.session.add(proovedor)
+
+    for sede in [s1,s2,s3,s4]:
+        db.session.add(sede)
     
     db.session.commit()
