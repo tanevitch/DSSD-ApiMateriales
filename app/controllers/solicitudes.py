@@ -22,9 +22,7 @@ def nueva_solicitud():
     get_jwt_identity()
     materiales_cantidades = request.json.get("materiales")
     fecha_necesaria_entrega = request.json.get("fecha_necesaria_entrega")
-    print("----------------------------------")
-    print(materiales_cantidades, fecha_necesaria_entrega)
-    print("----------------------------------")
+
     if (not materiales_cantidades or not fecha_necesaria_entrega):
         return jsonify({"Error": "Solicitud inválida"}), 400
     
@@ -41,9 +39,8 @@ def nueva_solicitud():
                     int(materiales_cantidades[id_material])
                 )
             )
-    print("----------------------------------")
-    print(productos_sin_stock)
-    print("----------------------------------")
+
+
     if (productos_sin_stock):
         return jsonify(
             {
@@ -69,17 +66,18 @@ def nueva_solicitud():
         db.session.merge(proovedor) 
     
     nuevo_pedido= Pedido(renglones)
-    print("----------------------------------")
-    print(nuevo_pedido)
-    print("----------------------------------")
-    if (nuevo_pedido.fecha_entrega >= datetime.strptime(fecha_necesaria_entrega, "%Y-%m-%d")):
+
+    if (nuevo_pedido.fecha_entrega > datetime.strptime(fecha_necesaria_entrega, "%Y-%m-%d")):
+        fecha_entrega= pedido_schema.dump(nuevo_pedido)["fecha_entrega"].split()[0]
+
         return jsonify(
             {
                 "id": None,
-                "detalle": f"La fecha de entrega puede ser para el { fecha_necesaria_entrega.split()[0]}",
-                "fecha_entrega": fecha_necesaria_entrega.split()[0]
+                "detalle": f"La fecha de entrega puede ser para el {fecha_entrega}",
+                "fecha_entrega": fecha_entrega
                 
             }), 400
+
 
     db.session.add(nuevo_pedido)
     db.session.commit()
@@ -87,7 +85,6 @@ def nueva_solicitud():
                 "id": pedido_schema.dump(nuevo_pedido)["id"],
                 "detalle": pedido_schema.dump(nuevo_pedido),
                 "fecha_entrega": pedido_schema.dump(nuevo_pedido)["fecha_entrega"].split()[0]
-             #   "fecha_entrega": datetime.strftime(datetime.strptime(pedido_schema.dump(nuevo_pedido)["fecha_entrega"], '%Y-%m-%d %H:%M:%S'), '%Y-%m-%d')
             }), 200
 
 @solicitudes.route("/consultar/<int:id>", methods=["GET"])
