@@ -44,10 +44,10 @@ def seed():
     s_fecha_fin = x = datetime.datetime(2024, 5, 17)
 
     from app.models.sede import Sede
-    s1= Sede("Marco y Atendió", "Fabricante de Marcos",s_fecha_inicio,s_fecha_fin)
-    s2= Sede("Estuche o esmiche", "Fabricante de estuches",s_fecha_inicio, s_fecha_fin)
-    s3= Sede("Patilla o Pati Después", "Fabricante de patillas",s_fecha_inicio, s_fecha_fin)
-    s4= Sede("Lente Jazo", "Fabricante de lentes",s_fecha_inicio, s_fecha_fin)
+    s1= Sede("Marcos", "Fabricante de Marcos",s_fecha_inicio,s_fecha_fin)
+    s2= Sede("Estuche", "Fabricante de estuches",s_fecha_inicio, s_fecha_fin)
+    s3= Sede("Patillas", "Fabricante de patillas",s_fecha_inicio, s_fecha_fin)
+    s4= Sede("Lentes", "Fabricante de lentes",s_fecha_inicio, s_fecha_fin)
 
         
     for proovedor in [p1,p2,p3,p4,p5,p6,p7,p8,p9,p10]:

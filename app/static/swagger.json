@@ -50,10 +50,10 @@
                 }
             }
         },
-        "/solicitudes/nueva": {
+        "/pedidos/nuevo": {
             "post": {
                 "tags": [
-                    "solicitudes"
+                    "pedidos"
                 ],
                 "summary": "Agregar solicitud",
                 "requestBody": {
