@@ -8,8 +8,10 @@ from app.models.material import Material
 from app.models.pedido import Pedido
 from app.models.proovedor import Proovedor
 from app.models.renglon import Renglon
+from app.models.sedes_reservadas import SedesReservadas
 from app.schemas.pedido import pedido_schema
 from app.schemas.renglon import renglones_schema
+from app.schemas.sedes_reservadas import sedes_reservadas_schema
 
 solicitudes = Blueprint('solicitudes', __name__, url_prefix='/pedidos')
 
@@ -105,3 +107,44 @@ def consultar_solicitud(id):
     db.session.add(solicitud)
     db.session.commit()
     return pedido_schema.dump(solicitud), 200
+
+@solicitudes.route("/fabricacion", methods=["POST"])
+@jwt_required()
+def fabricacion_solicitud():
+    get_jwt_identity()
+    inicio_disponibilidad = request.json.get("inicio_disponibilidad")
+    fecha_reserva = request.json.get("fecha_reserva")
+    id_pedido = request.json.get("id_pedido")
+
+    if (not fecha_reserva):
+        return jsonify({"Error": "Solicitud inválida"}), 400
+    
+    # CONSULTAR POR FECHAS
+    if (fecha_reserva < inicio_disponibilidad):
+        return jsonify(
+            {
+                "id": None,
+                "detalle": f"La fecha de reserva puede ser anterior a {inicio_disponibilidad}",
+                "fecha_reserva": fecha_reserva
+            }), 400
+
+    #  INTENTAR EFECTUAR PEDIDO
+    try:
+        nueva_reserva = SedesReservadas.append(SedesReservadas(
+            id_pedido = id_pedido,
+            fecha_reserva = fecha_reserva
+        ))
+    except:
+        return jsonify(
+        {
+            "id": None,
+            "detalle": f"id pedido es incorrecto"
+        }), 400
+
+    db.session.add(nueva_reserva)
+    db.session.commit()
+    return jsonify({
+                "id": sedes_reservadas_schema.dump(nueva_reserva)["id"],
+                "detalle": sedes_reservadas_schema.dump(nueva_reserva),
+                "FechaEntregaSedes": sedes_reservadas_schema.dump(nueva_reserva)["fecha_entrega_sedes"].split()[0]
+            }), 200
