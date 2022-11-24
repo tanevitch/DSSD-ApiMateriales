@@ -1,3 +1,4 @@
+from datetime import timedelta
 import random
 from app.db import db
 
@@ -11,7 +12,8 @@ class SedesReservadas(db.Model):
     def __init__(self, id_pedido, fecha_reserva):
         self.id_pedido = id_pedido
         self.fecha_reserva = fecha_reserva
-        self.fecha_entrega_sedes = fecha_reserva + random(10,90)
+        self.fecha_entrega_sedes = fecha_reserva + timedelta(days=random(10,90))
+        
 
     @classmethod 
     def all(cls):

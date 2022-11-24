@@ -12,6 +12,7 @@ from app.models.sedes_reservadas import SedesReservadas
 from app.schemas.pedido import pedido_schema
 from app.schemas.renglon import renglones_schema
 from app.schemas.sedes_reservadas import sedes_reservadas_schema
+from datetime import datetime, date
 
 solicitudes = Blueprint('solicitudes', __name__, url_prefix='/pedidos')
 
@@ -112,26 +113,29 @@ def consultar_solicitud(id):
 @jwt_required()
 def fabricacion_solicitud():
     get_jwt_identity()
-    inicio_disponibilidad = request.json.get("inicio_disponibilidad")
+    #inicio_disponibilidad = request.json.get("inicio_disponibilidad") este dato no se pide, se emite de la API a Bonita
     fecha_reserva = request.json.get("fecha_reserva")
-    id_pedido = request.json.get("id_pedido")
+    #id_pedido = request.json.get("id_pedido") este dato no se pide, se emite de la API a Bonita
 
     if (not fecha_reserva):
         return jsonify({"Error": "Solicitud inválida"}), 400
     
     # CONSULTAR POR FECHAS
+    # ESTABLECER INICIO DE DISPONIBILIDAD DE SEDES
+    #inicio_disponibilidad=date.today()
+    inicio_disponibilidad=datetime.datetime(2024, 5, 17)# año, mes, día
     if (fecha_reserva < inicio_disponibilidad):
         return jsonify(
             {
                 "id": None,
-                "detalle": f"La fecha de reserva puede ser anterior a {inicio_disponibilidad}",
+                "detalle": f"La fecha de reserva debe ser posterior a {inicio_disponibilidad}",
                 "fecha_reserva": fecha_reserva
             }), 400
 
     #  INTENTAR EFECTUAR PEDIDO
     try:
         nueva_reserva = SedesReservadas.append(SedesReservadas(
-            id_pedido = id_pedido,
+            #id_pedido = id_pedido, el ID pedido lo asigna la bdd
             fecha_reserva = fecha_reserva
         ))
     except:
@@ -145,6 +149,5 @@ def fabricacion_solicitud():
     db.session.commit()
     return jsonify({
                 "id": sedes_reservadas_schema.dump(nueva_reserva)["id"],
-                "detalle": sedes_reservadas_schema.dump(nueva_reserva),
-                "FechaEntregaSedes": sedes_reservadas_schema.dump(nueva_reserva)["fecha_entrega_sedes"].split()[0]
+                "fechaentregasedes": sedes_reservadas_schema.dump(nueva_reserva)["fecha_entrega_sedes"].split()[0]
             }), 200
