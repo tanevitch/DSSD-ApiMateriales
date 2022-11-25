@@ -12,7 +12,6 @@ sedes = Blueprint('sedes', __name__, url_prefix='/sedes')
 def todos():
     resp = {}
     resp["sedes"] = sedes_schema.dump(Sede.all())
-    resp["inicio_disponibilidad"] = datetime.now()
     return resp, 200
 
 @sedes.route("/<int:id>", methods=["GET"])

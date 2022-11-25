@@ -12,7 +12,8 @@ from app.models.sedes_reservadas import SedesReservadas
 from app.schemas.pedido import pedido_schema
 from app.schemas.renglon import renglones_schema
 from app.schemas.sedes_reservadas import sedes_reservadas_schema
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
+import random
 
 solicitudes = Blueprint('solicitudes', __name__, url_prefix='/pedidos')
 
@@ -113,18 +114,26 @@ def consultar_solicitud(id):
 @jwt_required()
 def fabricacion_solicitud():
     get_jwt_identity()
-    #inicio_disponibilidad = request.json.get("inicio_disponibilidad") este dato no se pide, se emite de la API a Bonita
-    fecha_reserva = request.json.get("fecha_reserva")
-    #id_pedido = request.json.get("id_pedido") este dato no se pide, se emite de la API a Bonita
+    id_pedido = request.json.get("idPedido")
+    fecha_reserva = request.json.get("fecha_reserva_sede")
+    fecha_lanzamiento = request.json.get("fecha_necesaria_entrega")# es fecha de lanzamiento
+
+    
 
     if (not fecha_reserva):
+        print("Soliciud invalida. Falta fecha reserva")
         return jsonify({"Error": "Solicitud inválida"}), 400
     
     # CONSULTAR POR FECHAS
     # ESTABLECER INICIO DE DISPONIBILIDAD DE SEDES
     #inicio_disponibilidad=date.today()
-    inicio_disponibilidad=datetime.datetime(2024, 5, 17)# año, mes, día
-    if (fecha_reserva < inicio_disponibilidad):
+    inicio_disponibilidad=datetime(2020, 5, 17)# año, mes, día
+    #fecha_entrega_sedes = inicio_disponibilidad + timedelta(days=random(10,90))
+    fecha_entrega_sedes = inicio_disponibilidad + timedelta(days=30)
+
+
+    if (datetime.strptime(fecha_reserva, "%Y-%m-%d") < inicio_disponibilidad):
+        print("Fecha reserva es menor a disponibilidad")
         return jsonify(
             {
                 "id": None,
@@ -132,13 +141,32 @@ def fabricacion_solicitud():
                 "fecha_reserva": fecha_reserva
             }), 400
 
+
+    if (not fecha_lanzamiento):
+        print("Soliciud invalida. Falta lanzamiento")
+        return jsonify({"Error": "Solicitud inválida"}), 400
+
+    if (fecha_entrega_sedes > datetime.strptime(fecha_lanzamiento, "%Y-%m-%d") ):
+        print("Entrega sedes es mayor a fecha lanzamiento")
+        return jsonify(
+            {
+                "id": None,
+                "detalle": f"La fecha de entrega debe ser anterior a {fecha_lanzamiento}",
+                "fecha_reserva": fecha_reserva
+            }), 400
+
+    
     #  INTENTAR EFECTUAR PEDIDO
     try:
-        nueva_reserva = SedesReservadas.append(SedesReservadas(
-            #id_pedido = id_pedido, el ID pedido lo asigna la bdd
-            fecha_reserva = fecha_reserva
-        ))
+        nueva_reserva = SedesReservadas.append(SedesReservadas(fecha_entrega_sedes = fecha_entrega_sedes))
+        print(nueva_reserva)
+       
+        # nueva_reserva = SedesReservadas.append(SedesReservadas(
+            
+        #     fecha_reserva = fecha_reserva
+        #))
     except:
+        print("catched!")
         return jsonify(
         {
             "id": None,
