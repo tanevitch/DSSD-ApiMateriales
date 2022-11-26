@@ -11,7 +11,7 @@ from app.models.renglon import Renglon
 from app.models.sedes_reservadas import SedesReservadas
 from app.schemas.pedido import pedido_schema
 from app.schemas.renglon import renglones_schema
-from app.schemas.sedes_reservadas import sedes_reservadas_schema
+from app.schemas.sedes_reservadas import sede_reservada_schema
 from datetime import datetime, date, timedelta
 import random
 
@@ -114,9 +114,16 @@ def consultar_solicitud(id):
 @jwt_required()
 def fabricacion_solicitud():
     get_jwt_identity()
-    id_pedido = request.json.get("idPedido")
+    #id_pedido = request.json.get("idPedido")
+    print("PASO 1")
     fecha_reserva = request.json.get("fecha_reserva_sede")
+    print("PASO 2")
     fecha_lanzamiento = request.json.get("fecha_necesaria_entrega")# es fecha de lanzamiento
+    print("PASO 3")
+    pedido_fabricacion = request.json.get("pedido_fabricacion")
+    print("PASO 4")
+    print("-*/-*/-*/PEDIDO ES")
+    print(pedido_fabricacion)
 
     
 
@@ -129,17 +136,18 @@ def fabricacion_solicitud():
     #inicio_disponibilidad=date.today()
     inicio_disponibilidad=datetime(2020, 5, 17)# año, mes, día
     #fecha_entrega_sedes = inicio_disponibilidad + timedelta(days=random(10,90))
-    fecha_entrega_sedes = inicio_disponibilidad + timedelta(days=30)
+    #fecha_entrega_sedes = inicio_disponibilidad + timedelta(days=30)
+    fecha_entrega_sedes = datetime.strptime(fecha_reserva, "%Y-%m-%d") + timedelta(days=30)
 
 
-    if (datetime.strptime(fecha_reserva, "%Y-%m-%d") < inicio_disponibilidad):
-        print("Fecha reserva es menor a disponibilidad")
-        return jsonify(
-            {
-                "id": None,
-                "detalle": f"La fecha de reserva debe ser posterior a {inicio_disponibilidad}",
-                "fecha_reserva": fecha_reserva
-            }), 400
+    # if (datetime.strptime(fecha_reserva, "%Y-%m-%d") < inicio_disponibilidad):
+    #     print("Fecha reserva es menor a disponibilidad")
+    #     return jsonify(
+    #         {
+    #             "id": None,
+    #             "detalle": f"La fecha de reserva debe ser posterior a {inicio_disponibilidad}",
+    #             "fecha_reserva": fecha_reserva
+    #         }), 400
 
 
     if (not fecha_lanzamiento):
@@ -158,7 +166,8 @@ def fabricacion_solicitud():
     
     #  INTENTAR EFECTUAR PEDIDO
     try:
-        nueva_reserva = SedesReservadas.append(SedesReservadas(fecha_entrega_sedes = fecha_entrega_sedes))
+        
+        nueva_reserva = SedesReservadas(fecha_entrega_sedes = fecha_entrega_sedes,marco_material = pedido_fabricacion["materialMarcos"], marco_cantidad = pedido_fabricacion["cantidadMarcos"],patillas_material = pedido_fabricacion["materialPatillas"],patillas_cantidad = pedido_fabricacion["cantidadPatillas"],estuche_material = pedido_fabricacion["materialEstuche"],escuche_cantidad = pedido_fabricacion["cantidadEstuche"],lentes_material= pedido_fabricacion["materialLentes"],lentes_cantidad = pedido_fabricacion["cantidadLentes"])
         print(nueva_reserva)
        
         # nueva_reserva = SedesReservadas.append(SedesReservadas(
@@ -167,6 +176,8 @@ def fabricacion_solicitud():
         #))
     except:
         print("catched!")
+        print(type(fecha_entrega_sedes))
+        print(fecha_entrega_sedes)
         return jsonify(
         {
             "id": None,
@@ -175,7 +186,13 @@ def fabricacion_solicitud():
 
     db.session.add(nueva_reserva)
     db.session.commit()
+    print("-*/-*/RESERVA-*/-*/-")
+    print(nueva_reserva.id)
+    #return sede_reservada_schema.dump(nueva_reserva), 200
+    #"id": sede_reservada_schema.dump(nueva_reserva)["id"],
+   
     return jsonify({
-                "id": sedes_reservadas_schema.dump(nueva_reserva)["id"],
-                "fechaentregasedes": sedes_reservadas_schema.dump(nueva_reserva)["fecha_entrega_sedes"].split()[0]
+                "id": nueva_reserva.id,
+                "fechaentregasedes": sede_reservada_schema.dump(nueva_reserva),
+                "estado":"CONFIRMADO"
             }), 200
