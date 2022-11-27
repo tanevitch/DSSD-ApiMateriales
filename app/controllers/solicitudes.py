@@ -220,15 +220,17 @@ def consultar_fabricacion(id):
     return pedido_schema.dump(solicitud.estado), 200
 
 
-@solicitudes.route("/modificarFechaFabricacion/<int:id><str:fecha>", methods=["GET"])
+@solicitudes.route("/modificarFechaFabricacion/<int:id><string:fecha>", methods=["GET"])
 
 def modificar_fecha_entrega(id,fecha):
-    
+  
     solicitud= SedesReservadas.query.get(id)
     if (not solicitud):
         return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
-    fecha=datetime.strptime(fecha,'%Y-%m-%d')
+    fecha = datetime.strptime(fecha, "%Y-%m-%d")
     solicitud.fecha_entrega_sedes=fecha
+    #fecha_2=datetime(2020, 5, 17)
+    #solicitud.fecha_entrega_sedes=fecha_2
     solicitud.estado="ATRASADO"
     db.session.add(solicitud)
     db.session.commit()
@@ -236,14 +238,13 @@ def modificar_fecha_entrega(id,fecha):
    
     return pedido_schema.dump(solicitud), 200
 
-@solicitudes.route("/terminarFabricacion/<int:id><str:fecha>", methods=["GET"])
+@solicitudes.route("/terminarFabricacion/<int:id>", methods=["GET"])
 
 def terminar_fabricacion(id):
     
     solicitud= SedesReservadas.query.get(id)
     if (not solicitud):
        return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
-    fecha=datetime.strptime(fecha,'%Y-%m-%d')
     solicitud.estado="FINALIZADO"
     db.session.add(solicitud)
     db.session.commit()
