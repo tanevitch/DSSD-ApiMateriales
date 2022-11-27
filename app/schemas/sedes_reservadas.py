@@ -5,6 +5,7 @@ class  SedesReservadasSchema(Schema):
     #id_pedido = fields.String(attribute="id_pedido")
     #fecha_reserva = fields.DateTime(attribute="fecha_reserva")
     fecha_entrega_sedes = fields.DateTime(attribute="fecha_entrega_sedes")
+    estado = fields.String(attribute="estado")
     marco_material = fields.String(attribute="marco_material")
     marco_cantidad = fields.Int(attribute="marco_cantidad")
     patillas_material = fields.String(attribute="patillas_material")

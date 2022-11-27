@@ -155,6 +155,14 @@ def fabricacion_solicitud():
         return jsonify({"Error": "Solicitud inválida"}), 400
 
     if (fecha_entrega_sedes > datetime.strptime(fecha_lanzamiento, "%Y-%m-%d") ):
+        print("fecha_entrega_sedes")
+        print(fecha_entrega_sedes)
+
+        print("fecha_lanzamiento")
+        print(datetime.strptime(fecha_lanzamiento, "%Y-%m-%d"))
+        print(fecha_lanzamiento)
+
+
         print("Entrega sedes es mayor a fecha lanzamiento")
         return jsonify(
             {
@@ -167,7 +175,7 @@ def fabricacion_solicitud():
     #  INTENTAR EFECTUAR PEDIDO
     try:
         
-        nueva_reserva = SedesReservadas(fecha_entrega_sedes = fecha_entrega_sedes,marco_material = pedido_fabricacion["materialMarcos"], marco_cantidad = pedido_fabricacion["cantidadMarcos"],patillas_material = pedido_fabricacion["materialPatillas"],patillas_cantidad = pedido_fabricacion["cantidadPatillas"],estuche_material = pedido_fabricacion["materialEstuche"],escuche_cantidad = pedido_fabricacion["cantidadEstuche"],lentes_material= pedido_fabricacion["materialLentes"],lentes_cantidad = pedido_fabricacion["cantidadLentes"])
+        nueva_reserva = SedesReservadas(fecha_entrega_sedes = fecha_entrega_sedes,estado = "CONFIRMADO", marco_material = pedido_fabricacion["materialMarcos"], marco_cantidad = pedido_fabricacion["cantidadMarcos"],patillas_material = pedido_fabricacion["materialPatillas"],patillas_cantidad = pedido_fabricacion["cantidadPatillas"],estuche_material = pedido_fabricacion["materialEstuche"],escuche_cantidad = pedido_fabricacion["cantidadEstuche"],lentes_material= pedido_fabricacion["materialLentes"],lentes_cantidad = pedido_fabricacion["cantidadLentes"])
         print(nueva_reserva)
        
         # nueva_reserva = SedesReservadas.append(SedesReservadas(
@@ -193,6 +201,54 @@ def fabricacion_solicitud():
    
     return jsonify({
                 "id": nueva_reserva.id,
-                "fechaentregasedes": sede_reservada_schema.dump(nueva_reserva),
+                "fecha_entrega_sedes": datetime.strptime(fecha_entrega_sedes,'%Y-%m-%d'),
+                "detalle": sede_reservada_schema.dump(nueva_reserva),
                 "estado":"CONFIRMADO"
             }), 200
+
+
+@solicitudes.route("/consultarFabricacion/<int:id>", methods=["GET"])
+@jwt_required()
+def consultar_fabricacion(id):
+    get_jwt_identity()
+    solicitud= SedesReservadas.query.get(id)
+    if (not solicitud):
+        return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
+
+     
+   
+    return pedido_schema.dump(solicitud.estado), 200
+
+
+@solicitudes.route("/modificarFechaFabricacion/<int:id><str:fecha>", methods=["GET"])
+
+def modificar_fecha_entrega(id,fecha):
+    
+    solicitud= SedesReservadas.query.get(id)
+    if (not solicitud):
+        return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
+    fecha=datetime.strptime(fecha,'%Y-%m-%d')
+    solicitud.fecha_entrega_sedes=fecha
+    solicitud.estado="ATRASADO"
+    db.session.add(solicitud)
+    db.session.commit()
+    
+   
+    return pedido_schema.dump(solicitud), 200
+
+@solicitudes.route("/terminarFabricacion/<int:id><str:fecha>", methods=["GET"])
+
+def terminar_fabricacion(id):
+    
+    solicitud= SedesReservadas.query.get(id)
+    if (not solicitud):
+       return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
+    fecha=datetime.strptime(fecha,'%Y-%m-%d')
+    solicitud.estado="FINALIZADO"
+    db.session.add(solicitud)
+    db.session.commit()
+
+    return pedido_schema.dump(solicitud), 200
+    
+   
+    
