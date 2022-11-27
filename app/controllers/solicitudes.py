@@ -115,40 +115,16 @@ def consultar_solicitud(id):
 def fabricacion_solicitud():
     get_jwt_identity()
     #id_pedido = request.json.get("idPedido")
-    print("PASO 1")
     fecha_reserva = request.json.get("fecha_reserva_sede")
-    print("PASO 2")
     fecha_lanzamiento = request.json.get("fecha_necesaria_entrega")# es fecha de lanzamiento
-    print("PASO 3")
     pedido_fabricacion = request.json.get("pedido_fabricacion")
-    print("PASO 4")
-    print("-*/-*/-*/PEDIDO ES")
-    print(pedido_fabricacion)
-
     
 
     if (not fecha_reserva):
         print("Soliciud invalida. Falta fecha reserva")
         return jsonify({"Error": "Solicitud inválida"}), 400
-    
-    # CONSULTAR POR FECHAS
-    # ESTABLECER INICIO DE DISPONIBILIDAD DE SEDES
-    #inicio_disponibilidad=date.today()
-    inicio_disponibilidad=datetime(2020, 5, 17)# año, mes, día
-    #fecha_entrega_sedes = inicio_disponibilidad + timedelta(days=random(10,90))
-    #fecha_entrega_sedes = inicio_disponibilidad + timedelta(days=30)
+
     fecha_entrega_sedes = datetime.strptime(fecha_reserva, "%Y-%m-%d") + timedelta(days=30)
-
-
-    # if (datetime.strptime(fecha_reserva, "%Y-%m-%d") < inicio_disponibilidad):
-    #     print("Fecha reserva es menor a disponibilidad")
-    #     return jsonify(
-    #         {
-    #             "id": None,
-    #             "detalle": f"La fecha de reserva debe ser posterior a {inicio_disponibilidad}",
-    #             "fecha_reserva": fecha_reserva
-    #         }), 400
-
 
     if (not fecha_lanzamiento):
         print("Soliciud invalida. Falta lanzamiento")
@@ -206,50 +182,40 @@ def fabricacion_solicitud():
                 "estado":"CONFIRMADO"
             }), 200
 
-
+#http://localhost:5000/pedidos/consultarFabricacion/1
 @solicitudes.route("/consultarFabricacion/<int:id>", methods=["GET"])
-@jwt_required()
 def consultar_fabricacion(id):
-    get_jwt_identity()
     solicitud= SedesReservadas.query.get(id)
     if (not solicitud):
         return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
 
-     
-   
-    return pedido_schema.dump(solicitud.estado), 200
+    if solicitud.fecha_entrega_sedes <= datetime.today():
+        solicitud.estado = "FINALIZADO"
+        db.session.commit()
 
+    return jsonify({"Estado": solicitud.estado}), 200
 
-@solicitudes.route("/modificarFechaFabricacion/<int:id><string:fecha>", methods=["GET"])
-
+#http://localhost:5000/pedidos/modificarFechaFabricacion/1/2030-03-30
+@solicitudes.route("/modificarFechaFabricacion/<int:id>/<string:fecha>", methods=["GET"])
 def modificar_fecha_entrega(id,fecha):
-  
     solicitud= SedesReservadas.query.get(id)
     if (not solicitud):
         return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
     fecha = datetime.strptime(fecha, "%Y-%m-%d")
     solicitud.fecha_entrega_sedes=fecha
-    #fecha_2=datetime(2020, 5, 17)
-    #solicitud.fecha_entrega_sedes=fecha_2
     solicitud.estado="ATRASADO"
-    db.session.add(solicitud)
     db.session.commit()
     
-   
     return pedido_schema.dump(solicitud), 200
 
-@solicitudes.route("/terminarFabricacion/<int:id>", methods=["GET"])
 
+@solicitudes.route("/terminarFabricacion/<int:id>", methods=["GET"])
 def terminar_fabricacion(id):
-    
     solicitud= SedesReservadas.query.get(id)
     if (not solicitud):
        return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
+    solicitud.fecha_entrega_sedes=datetime.today()
     solicitud.estado="FINALIZADO"
-    db.session.add(solicitud)
     db.session.commit()
 
     return pedido_schema.dump(solicitud), 200
-    
-   
-    
