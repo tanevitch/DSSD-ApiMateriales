@@ -87,21 +87,16 @@ def nueva_solicitud():
                 "fecha_entrega": pedido_schema.dump(nuevo_pedido)["fecha_entrega"].split()[0]
             }), 200
 
-@solicitudes.route("/consultar/<int:id>", methods=["GET"])
+@solicitudes.route("/cancelar", methods=["POST"])
 @jwt_required()
-def consultar_solicitud(id):
+def consultar_solicitud():
     get_jwt_identity()
+    id = request.json.get("idPedido")
     solicitud= Pedido.buscarPorId(id)
     if (not solicitud):
         return jsonify({"Error": f"No hay un pedido con id {id}"}), 404
     
-    # Simulación de reprogramación de fecha_entrega
-    if (randint(0,5)==3):
-        solicitud.fecha_entrega= solicitud.fechaEntregaRandom()
-        if (solicitud.fecha_entrega >= solicitud.fecha_necesaria_entrega):
-            solicitud.estado= "cancelada"
-            return jsonify({"Error": f"No se puede satisfacer el pedido. La fecha de entrega estimada es el {solicitud.fecha_entrega}"}), 400
-
-    db.session.add(solicitud)
+    solicitud.estado= "CANCELADO"
+    db.session.merge(solicitud)
     db.session.commit()
     return pedido_schema.dump(solicitud), 200
