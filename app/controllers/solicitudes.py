@@ -177,7 +177,7 @@ def fabricacion_solicitud():
    
     return jsonify({
                 "id": nueva_reserva.id,
-                "fecha_entrega_sedes": datetime.strptime(fecha_entrega_sedes,'%Y-%m-%d'),
+                "fecha_entrega_sedes": fecha_entrega_sedes,
                 "detalle": sede_reservada_schema.dump(nueva_reserva),
                 "estado":"CONFIRMADO"
             }), 200
@@ -193,7 +193,7 @@ def consultar_fabricacion(id):
         solicitud.estado = "FINALIZADO"
         db.session.commit()
 
-    return jsonify({"Estado": solicitud.estado}), 200
+    return jsonify({"estado": solicitud.estado}), 200
 
 #http://localhost:5000/pedidos/modificarFechaFabricacion/1/2030-03-30
 @solicitudes.route("/modificarFechaFabricacion/<int:id>/<string:fecha>", methods=["GET"])
