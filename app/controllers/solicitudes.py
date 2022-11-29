@@ -177,10 +177,14 @@ def fabricacion_solicitud():
                 "estado":"CONFIRMADO"
             }), 200
 
-#http://localhost:5000/pedidos/consultarFabricacion/1
-@solicitudes.route("/consultarFabricacion/<int:id>", methods=["GET"])
+#http://localhost:5000/pedidos/consultarFabricacion/
+@jwt_required()
+@solicitudes.route("/consultarFabricacion", methods=["POST"])
 def consultar_fabricacion(id):
-    solicitud= SedesReservadas.query.get(id)
+    get_jwt_identity()
+    id = request.json.get("idPedidoSede")
+    solicitud= Pedido.buscarPorId(id)
+    
     if (not solicitud):
         return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
 
