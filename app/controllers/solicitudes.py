@@ -96,12 +96,18 @@ def nueva_solicitud():
 def cancelar_solicitud():
     get_jwt_identity()
     id = request.json.get("idPedido")
+    id_reserva = request.json.get("idPedidoSede")
     solicitud= Pedido.buscarPorId(id)
+    solicitud2 = SedesReservadas.buscarPorId(id_reserva)
     if (not solicitud):
         return jsonify({"Error": f"No hay un pedido con id {id}"}), 404
+    if (not solicitud2):
+        return jsonify({"Error": f"No hay un reserva de sede con id {id}"}), 404
     
+    solicitud2.estado = "CANCELADO"
     solicitud.estado= "CANCELADO"
     db.session.merge(solicitud)
+    db.session.merge(solicitud2)
     db.session.commit()
     return pedido_schema.dump(solicitud), 200
 
