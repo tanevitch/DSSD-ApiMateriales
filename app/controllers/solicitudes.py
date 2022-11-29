@@ -178,12 +178,14 @@ def fabricacion_solicitud():
             }), 200
 
 #http://localhost:5000/pedidos/consultarFabricacion/
-@jwt_required()
+
 @solicitudes.route("/consultarFabricacion", methods=["POST"])
-def consultar_fabricacion(id):
+@jwt_required()
+def consultar_fabricacion():
     get_jwt_identity()
+    print (request.json)
     id = request.json.get("idPedidoSede")
-    solicitud= Pedido.buscarPorId(id)
+    solicitud= SedesReservadas.buscarPorId(id)
     
     if (not solicitud):
         return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
@@ -207,7 +209,7 @@ def modificar_fecha_entrega(id,fecha):
     
     return pedido_schema.dump(solicitud), 200
 
-
+#http://localhost:5000/pedidos/terminarFabricacion/
 @solicitudes.route("/terminarFabricacion/<int:id>", methods=["GET"])
 def terminar_fabricacion(id):
     solicitud= SedesReservadas.query.get(id)
@@ -218,3 +220,23 @@ def terminar_fabricacion(id):
     db.session.commit()
 
     return pedido_schema.dump(solicitud), 200
+
+#http://localhost:5000/pedidos/confirmarFabricacion/
+
+@solicitudes.route("/confirmarFabricacion", methods=["POST"])
+@jwt_required()
+def confirmar_fabricacion():
+    get_jwt_identity()
+    print (request.json)
+    id = request.json.get("idPedidoSede")
+    solicitud= SedesReservadas.buscarPorId(id)
+    
+    if (not solicitud):
+        return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
+
+   
+    solicitud.estado = "CONFIRMADO"
+    db.session.commit()
+
+    return jsonify({"estado": solicitud.estado}), 200
+

@@ -39,3 +39,7 @@ class SedesReservadas(db.Model):
     @classmethod 
     def all(cls):
         return cls.query.all()
+
+    @classmethod
+    def buscarPorId(cls, id):
+        return cls.query.get(id)
