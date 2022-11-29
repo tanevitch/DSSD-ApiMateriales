@@ -7,15 +7,11 @@ class Sede(db.Model):
     id_sede= db.Column(db.Integer(), primary_key = True)
     nombre = db.Column(db.String(100), nullable = False)
     fabrica = db.Column(db.String(255), nullable = False)
-    inicio_disponibilidad = db.Column(db.DateTime, nullable = False)
-    fin_disponibilidad = db.Column(db.DateTime, nullable = False)
 
 
-    def __init__(self, nombre, fabrica, inicio_disponibilidad, fin_disponibilidad):
+    def __init__(self, nombre, fabrica):
         self.nombre = nombre
         self.fabrica= fabrica
-        self.inicio_disponibilidad = inicio_disponibilidad
-        self.fin_disponibilidad = fin_disponibilidad
 
     @classmethod
     def buscarPorId(cls, id):
