@@ -101,15 +101,18 @@ def cancelar_solicitud():
     solicitud2 = SedesReservadas.buscarPorId(id_reserva)
     if (not solicitud):
         return jsonify({"Error": f"No hay un pedido con id {id}"}), 404
-    if (not solicitud2):
-        return jsonify({"Error": f"No hay un reserva de sede con id {id}"}), 404
+    if (solicitud2):
+        #return jsonify({"Error": f"No hay un reserva de sede con id {id}"}), 404
+        solicitud2.estado = "CANCELADO"
+        db.session.merge(solicitud2)
     
-    solicitud2.estado = "CANCELADO"
+    
     solicitud.estado= "CANCELADO"
     db.session.merge(solicitud)
-    db.session.merge(solicitud2)
+    
     db.session.commit()
-    return pedido_schema.dump(solicitud), 200
+    return jsonify("Se cancelaron los pedidos"), 200
+    #return pedido_schema.dump(solicitud), 200
 
 @solicitudes.route("/fabricacion", methods=["POST"])
 @jwt_required()

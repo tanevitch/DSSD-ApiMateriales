@@ -25,7 +25,11 @@
         },
         {
             "name": "materiales",
-            "description": "About materiales"
+            "description": "Acerca de materiales"
+        },
+        {
+            "name": "consultaFabricacion",
+            "description": "Consultar estado de fabricación"
         }
     ],
     "paths": {
@@ -88,7 +92,117 @@
                 ],
                 "x-codegen-request-body-name": "body"
             }
+        },
+        "/pedidos/fabricacion": {
+            "post": {
+                "tags": [
+                    "fabricacion"
+                ],
+                "summary": "Agregar solicitud de reserva de sede",
+                "requestBody": {
+                    "description": "Parámetros para realizar la reserva de sedes",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Fabricacion"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Solicitud aceptada.",
+                        "content": {}
+                    },
+                    "400": {
+                        "description": "Solicitud inválida.",
+                        "content": {}
+                    },
+                    "405": {
+                        "description": "Método no permitido.",
+                        "content": {}
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/pedidos/consultarFabricacion": {
+            "post": {
+                "tags": [
+                    "consultaFabricacion"
+                ],
+                "summary": "Consultar estado de la fabricación",
+                "requestBody": {
+                    "description": "Parámetros para realizar la consulta del estado de fabricación",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EstadoFabricacion"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Estado de la fabricación",
+                        "content": {}
+                    },
+                    "404": {
+                        "description": "No hay una reserva de fabricación con id",
+                        "content": {}
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/pedidos/cancelar": {
+            "post": {
+                "tags": [
+                    "Cancelar pedidos de materiales y sede"
+                ],
+                "summary": "Cancela pedidos de materiales y sede",
+                "requestBody": {
+                    "description": "Parámetros para realizar la consulta del estado de fabricación",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Cancelar"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Estado de la fabricación",
+                        "content": {}
+                    },
+                    "404": {
+                        "description": "No hay pedido con ese id",
+                        "content": {}
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "x-codegen-request-body-name": "body"
+            }
         }
+
     },
     "components": {
         "schemas": {
@@ -114,6 +228,45 @@
                     "materiales": {
                         "type": "object",
                         "example": "{\"4\":\"20\",\"3\":\"13\"}"
+                    }
+                }
+            },
+            "EstadoFabricacion": {
+                "type": "object",
+                "properties": {
+                    "idPedidoSede": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "Cancelar": {
+                "type": "object",
+                "properties": {
+                    "idPedido": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "idPedidoSede": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "Fabricacion": {
+                "type": "object",
+                "properties": {
+                    "fecha_reserva_sede": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "fecha_necesaria_entrega": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "pedido_fabricacion": {
+                        "type": "object",
+                        "example": "{\"materialMarcos\":\"1\",\"cantidadMarcos\":\"250\",\"materialPatillas\":\"1\",\"cantidadPatillas\":\"200\",\"materialEstuche\":\"2\",\"cantidadEstuche\":\"3\",\"materialLentes\":\"3\",\"cantidadLentes\":\"290\"}"
                     }
                 }
             }
