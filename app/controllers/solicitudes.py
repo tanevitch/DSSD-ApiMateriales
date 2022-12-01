@@ -181,7 +181,7 @@ def fabricacion_solicitud():
    
     return jsonify({
                 "id": nueva_reserva.id,
-                "fecha_entrega_sedes": fecha_entrega_sedes,
+                "fecha_entrega_sedes": fecha_entrega_sedes.strftime("%Y-%m-%d"),
                 "detalle": sede_reservada_schema.dump(nueva_reserva),
                 "estado":"CONFIRMADO"
             }), 200
