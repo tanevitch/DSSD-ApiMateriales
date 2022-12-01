@@ -20,15 +20,11 @@
     ,
     "tags": [
         {
-            "name": "solicitudes",
-            "description": "Solicitudes de materiales"
-        },
-        {
-            "name": "materiales",
+            "name": "Materiales",
             "description": "Acerca de materiales"
         },
         {
-            "name": "consultaFabricacion",
+            "name": "Fabricacion",
             "description": "Consultar estado de fabricación"
         }
     ],
@@ -36,7 +32,7 @@
         "/materiales": {
             "get": {
                 "tags": [
-                    "materiales"
+                    "Materiales"
                 ],
                 "summary": "Listado de materiales",
                 "description": "Obtiene listado de materiales disponibles junto a su ID",
@@ -57,7 +53,7 @@
         "/sedes": {
             "get": {
                 "tags": [
-                    "sedes"
+                    "Fabricacion"
                 ],
                 "summary": "Listado de sedes",
                 "description": "Obtiene listado de sedes disponibles junto a su ID y lo que fabrica",
@@ -78,7 +74,7 @@
         "/pedidos/nuevo": {
             "post": {
                 "tags": [
-                    "pedidos"
+                    "Materiales"
                 ],
                 "summary": "Agregar solicitud",
                 "requestBody": {
@@ -117,7 +113,7 @@
         "/pedidos/fabricacion": {
             "post": {
                 "tags": [
-                    "fabricacion"
+                    "Fabricacion"
                 ],
                 "summary": "Agregar solicitud de reserva de sede",
                 "requestBody": {
@@ -156,7 +152,7 @@
         "/pedidos/consultarFabricacion": {
             "post": {
                 "tags": [
-                    "consultaFabricacion"
+                    "Fabricacion"
                 ],
                 "summary": "Consultar estado de la fabricación",
                 "requestBody": {
@@ -191,7 +187,7 @@
         "/pedidos/cancelar": {
             "post": {
                 "tags": [
-                    "Cancelar pedidos de materiales y sede"
+                    "Finalizar"
                 ],
                 "summary": "Cancela pedidos de materiales y sede",
                 "requestBody": {
