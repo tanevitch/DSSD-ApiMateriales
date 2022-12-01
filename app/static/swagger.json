@@ -54,6 +54,27 @@
                 }
             }
         },
+        "/sedes": {
+            "get": {
+                "tags": [
+                    "sedes"
+                ],
+                "summary": "Listado de sedes",
+                "description": "Obtiene listado de sedes disponibles junto a su ID y lo que fabrica",
+                "responses": {
+                    "200": {
+                        "description": "successful operation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Sedes"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/pedidos/nuevo": {
             "post": {
                 "tags": [
@@ -212,6 +233,28 @@
                     "id_material": {
                         "type": "integer",
                         "format": "int32"
+                    },
+                    "nombre": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Sedes": {
+                "type": "object",
+                "properties": {
+                    "sedes": {
+                        "numero": {
+                            "fabrica": {
+                                "type": "string"
+                            },
+                            "id_sede": {
+                                "type": "integer",
+                                "format": "int32"
+                            },
+                            "nombre":{
+                                "type": "string"
+                            }
+                        }
                     },
                     "nombre": {
                         "type": "string"
