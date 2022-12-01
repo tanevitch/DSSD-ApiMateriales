@@ -1,3 +1,4 @@
+from datetime import timedelta
 from os import environ
 from flask import Flask
 from app.controllers.auth import auth
@@ -50,6 +51,7 @@ def create_app(environment="development"):
 
 
     # JWT
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
     app.config["JWT_SECRET_KEY"] = "uwu"  
     JWTManager(app)
 

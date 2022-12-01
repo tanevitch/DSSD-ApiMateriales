@@ -13,11 +13,11 @@ from app.schemas.pedido import pedido_schema
 from app.schemas.renglon import renglones_schema
 from app.schemas.sedes_reservadas import sede_reservada_schema
 from datetime import datetime, date, timedelta
-import random
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 solicitudes = Blueprint('solicitudes', __name__, url_prefix='/pedidos')
-
-  
 
 
 @solicitudes.route("/nuevo", methods=["POST"])
@@ -28,6 +28,7 @@ def nueva_solicitud():
     fecha_necesaria_entrega = request.json.get("fecha_necesaria_entrega")
 
     if (not materiales_cantidades or not fecha_necesaria_entrega):
+        logging.info("Formato de entrada incorrecto")
         return jsonify({"Error": "Solicitud inválida"}), 400
     
     # CONSULTAR POR STOCK
@@ -46,6 +47,7 @@ def nueva_solicitud():
 
 
     if (productos_sin_stock):
+        logging.info("No hay stock suficiente para satisfacer el pedido")
         return jsonify(
             {
                 "id": None,
@@ -73,6 +75,7 @@ def nueva_solicitud():
 
     if (nuevo_pedido.fecha_entrega > datetime.strptime(fecha_necesaria_entrega, "%Y-%m-%d")):
         fecha_entrega= pedido_schema.dump(nuevo_pedido)["fecha_entrega"].split()[0]
+        logging.info("No se puede satisfacer el pedido en la fecha solicitada")
 
         return jsonify(
             {
@@ -85,6 +88,8 @@ def nueva_solicitud():
 
     db.session.add(nuevo_pedido)
     db.session.commit()
+    logging.info(f"Se generó el pedido con id {nuevo_pedido.id_pedido}")
+
     return jsonify({
                 "id": pedido_schema.dump(nuevo_pedido)["id"],
                 "detalle": pedido_schema.dump(nuevo_pedido),
@@ -109,8 +114,9 @@ def cancelar_solicitud():
     
     solicitud.estado= "CANCELADO"
     db.session.merge(solicitud)
-    
     db.session.commit()
+    logging.info(f"Se cancelaron todos los pedidos existentes")
+
     return jsonify("Se cancelaron los pedidos"), 200
     #return pedido_schema.dump(solicitud), 200
 
@@ -125,25 +131,24 @@ def fabricacion_solicitud():
     
 
     if (not fecha_reserva):
-        print("Soliciud invalida. Falta fecha reserva")
+        logging.info("Soliciud invalida. Falta fecha reserva")
         return jsonify({"Error": "Solicitud inválida"}), 400
 
     fecha_entrega_sedes = datetime.strptime(fecha_reserva, "%Y-%m-%d") + timedelta(days=30)
 
     if (not fecha_lanzamiento):
-        print("Soliciud invalida. Falta lanzamiento")
+        logging.info("Soliciud invalida. Falta lanzamiento")
         return jsonify({"Error": "Solicitud inválida"}), 400
 
     if (fecha_entrega_sedes > datetime.strptime(fecha_lanzamiento, "%Y-%m-%d") ):
-        print("fecha_entrega_sedes")
-        print(fecha_entrega_sedes)
+        # print("fecha_entrega_sedes")
+        # print(fecha_entrega_sedes)
 
-        print("fecha_lanzamiento")
-        print(datetime.strptime(fecha_lanzamiento, "%Y-%m-%d"))
-        print(fecha_lanzamiento)
+        # print("fecha_lanzamiento")
+        # print(datetime.strptime(fecha_lanzamiento, "%Y-%m-%d"))
+        # print(fecha_lanzamiento)
 
-
-        print("Entrega sedes es mayor a fecha lanzamiento")
+        logging.info("Entrega sedes es mayor a fecha lanzamiento")
         return jsonify(
             {
                 "id": None,
@@ -156,16 +161,11 @@ def fabricacion_solicitud():
     try:
         
         nueva_reserva = SedesReservadas(fecha_entrega_sedes = fecha_entrega_sedes,estado = "CONFIRMADO", marco_material = pedido_fabricacion["materialMarcos"], marco_cantidad = pedido_fabricacion["cantidadMarcos"],patillas_material = pedido_fabricacion["materialPatillas"],patillas_cantidad = pedido_fabricacion["cantidadPatillas"],estuche_material = pedido_fabricacion["materialEstuche"],escuche_cantidad = pedido_fabricacion["cantidadEstuche"],lentes_material= pedido_fabricacion["materialLentes"],lentes_cantidad = pedido_fabricacion["cantidadLentes"])
-        print(nueva_reserva)
        
-        # nueva_reserva = SedesReservadas.append(SedesReservadas(
-            
-        #     fecha_reserva = fecha_reserva
-        #))
     except:
         print("catched!")
         print(type(fecha_entrega_sedes))
-        print(fecha_entrega_sedes)
+        logging.info(f"El pedido es incorrecto")
         return jsonify(
         {
             "id": None,
@@ -174,8 +174,8 @@ def fabricacion_solicitud():
 
     db.session.add(nueva_reserva)
     db.session.commit()
-    print("-*/-*/RESERVA-*/-*/-")
-    print(nueva_reserva.id)
+    logging.info(f"Reserva con id {nueva_reserva.id} generada exitosamente")
+
     #return sede_reservada_schema.dump(nueva_reserva), 200
     #"id": sede_reservada_schema.dump(nueva_reserva)["id"],
    
@@ -197,12 +197,14 @@ def consultar_fabricacion():
     solicitud= SedesReservadas.buscarPorId(id)
     
     if (not solicitud):
+        logging.info(f"No hay una reserva de fabricación con id {id}")
+
         return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
 
     if solicitud.fecha_entrega_sedes <= datetime.today():
         solicitud.estado = "FINALIZADO"
         db.session.commit()
-
+    logging.info(f"El estado de la reserva {id} es {solicitud.estado}")
     return jsonify({"estado": solicitud.estado}), 200
 
 #http://localhost:5000/pedidos/modificarFechaFabricacion/1/2030-03-30
@@ -215,7 +217,7 @@ def modificar_fecha_entrega(id,fecha):
     solicitud.fecha_entrega_sedes=fecha
     solicitud.estado="ATRASADO"
     db.session.commit()
-    
+    logging.info(f"Se atrasó la reserva con id {id} para la fecha {fecha}")  
     return pedido_schema.dump(solicitud), 200
 
 #http://localhost:5000/pedidos/terminarFabricacion/
@@ -226,6 +228,8 @@ def terminar_fabricacion(id):
        return jsonify({"Error": f"No hay una reserva de fabricación con id {id}"}), 404
     solicitud.fecha_entrega_sedes=datetime.today()
     solicitud.estado="FINALIZADO"
+    logging.info(f"Se finalizó la fabricacion de la reserva con id {id}")  
+
     db.session.commit()
 
     return pedido_schema.dump(solicitud), 200
@@ -246,6 +250,7 @@ def confirmar_fabricacion():
    
     solicitud.estado = "CONFIRMADO"
     db.session.commit()
+    logging.info(f"Se confirmó la fabricacion de la reserva con id {id}")  
 
     return jsonify({"estado": solicitud.estado}), 200
 
